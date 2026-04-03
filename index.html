@@ -2,31 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gemstone Receipt Generator</title>
   <style>
-    body { font-family: Arial; margin: 40px; }
+    body { font-family: Arial; margin: 20px; }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 28%;
+    }
+
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid black; padding: 8px; text-align: center; }
-    .btn { padding: 8px 12px; margin: 5px; cursor: pointer; }
+
+    .btn { padding: 10px 14px; margin: 5px; cursor: pointer; }
+
     #receipt { margin-top: 40px; }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 📱 Mobile Optimization */
+    @media (max-width: 600px) {
+      input {
+        width: 100%;
+        display: block;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      table, th, td {
+        font-size: 14px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* 🖨️ Print only receipt */
     @media print {
-      .no-print { display: none; }
+      body * {
+        visibility: hidden;
+      }
+
+      #receipt, #receipt * {
+        visibility: visible;
+      }
+
+      #receipt {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
+
+      .no-print {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
 
-<h2>Gemstone Receipt Generator</h2>
+<h2 class="no-print">Gemstone Receipt Generator</h2>
+
+<div class="no-print top-bar">
+  <div>
+    <input type="text" id="stone" placeholder="Stone Name">
+    <input type="number" id="qty" placeholder="Quantity">
+    <input type="number" id="price" placeholder="Price per unit">
+  </div>
+  <div>
+    <label>Date: </label>
+    <input type="date" id="date">
+  </div>
+</div>
 
 <div class="no-print">
-  <input type="text" id="stone" placeholder="Stone Name">
-  <input type="number" id="qty" placeholder="Quantity">
-  <input type="number" id="price" placeholder="Price per unit">
   <button class="btn" onclick="addItem()">Add</button>
   <button class="btn" onclick="generateReceipt()">Generate Receipt</button>
 </div>
 
-<table id="inputTable">
+<table id="inputTable" class="no-print">
   <thead>
     <tr>
       <th>Stone</th>
@@ -42,6 +107,12 @@
 
 <script>
   let items = [];
+
+  // Set today's date automatically
+  window.onload = function () {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;
+  };
 
   function addItem() {
     const stone = document.getElementById('stone').value;
@@ -72,9 +143,13 @@
 
   function generateReceipt() {
     let grandTotal = 0;
+    const selectedDate = document.getElementById('date').value;
 
     let receiptHTML = `
-      <h3>Official Receipt</h3>
+      <div style="display:flex; justify-content:space-between;">
+        <h3>Official Receipt</h3>
+        <div><strong>Date:</strong> ${selectedDate}</div>
+      </div>
       <table>
         <tr>
           <th>Stone</th>
@@ -100,6 +175,7 @@
         <td><strong>${grandTotal}</strong></td>
       </tr>
       </table>
+      <br>
       <button class="btn no-print" onclick="window.print()">Print Receipt</button>
     `;
 
