@@ -10,7 +10,7 @@
     input {
       padding: 10px;
       margin: 5px;
-      width: 28%;
+      width: 22%;
     }
 
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -24,49 +24,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
 
-    /* 📱 Mobile Optimization */
     @media (max-width: 600px) {
-      input {
-        width: 100%;
-        display: block;
-      }
-
-      .btn {
-        width: 100%;
-      }
-
-      table, th, td {
-        font-size: 14px;
-      }
-
-      .top-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      input { width: 100%; display: block; }
+      .btn { width: 100%; }
+      table, th, td { font-size: 14px; }
+      .top-bar { flex-direction: column; align-items: flex-start; }
     }
 
-    /* 🖨️ Print only receipt */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-
-      #receipt, #receipt * {
-        visibility: visible;
-      }
-
-      #receipt {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-      }
-
-      .no-print {
-        display: none;
-      }
+      body * { visibility: hidden; }
+      #receipt, #receipt * { visibility: visible; }
+      #receipt { position: absolute; top: 0; left: 0; width: 100%; }
+      .no-print { display: none; }
     }
   </style>
 </head>
@@ -78,6 +50,7 @@
   <div>
     <input type="text" id="stone" placeholder="Stone Name">
     <input type="number" id="qty" placeholder="Quantity">
+    <input type="number" id="weight" placeholder="Weight">
     <input type="number" id="price" placeholder="Price per unit">
   </div>
   <div>
@@ -96,6 +69,7 @@
     <tr>
       <th>Stone</th>
       <th>Quantity</th>
+      <th>Weight</th>
       <th>Price</th>
       <th>Total</th>
     </tr>
@@ -108,7 +82,6 @@
 <script>
   let items = [];
 
-  // Set today's date automatically
   window.onload = function () {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').value = today;
@@ -117,19 +90,21 @@
   function addItem() {
     const stone = document.getElementById('stone').value;
     const qty = parseFloat(document.getElementById('qty').value);
+    const weight = parseFloat(document.getElementById('weight').value);
     const price = parseFloat(document.getElementById('price').value);
 
-    if (!stone || !qty || !price) {
+    if (!stone || !qty || !weight || !price) {
       alert('Please fill all fields');
       return;
     }
 
-    const total = qty * price;
-    items.push({ stone, qty, price, total });
+    const total = qty * weight * price;
+    items.push({ stone, qty, weight, price, total });
 
     const row = `<tr>
       <td>${stone}</td>
       <td>${qty}</td>
+      <td>${weight}</td>
       <td>${price}</td>
       <td>${total}</td>
     </tr>`;
@@ -138,6 +113,7 @@
 
     document.getElementById('stone').value = '';
     document.getElementById('qty').value = '';
+    document.getElementById('weight').value = '';
     document.getElementById('price').value = '';
   }
 
@@ -154,6 +130,7 @@
         <tr>
           <th>Stone</th>
           <th>Quantity</th>
+          <th>Weight</th>
           <th>Price</th>
           <th>Total</th>
         </tr>`;
@@ -164,6 +141,7 @@
         <tr>
           <td>${item.stone}</td>
           <td>${item.qty}</td>
+          <td>${item.weight}</td>
           <td>${item.price}</td>
           <td>${item.total}</td>
         </tr>`;
@@ -171,7 +149,7 @@
 
     receiptHTML += `
       <tr>
-        <td colspan="3"><strong>Grand Total</strong></td>
+        <td colspan="4"><strong>Grand Total</strong></td>
         <td><strong>${grandTotal}</strong></td>
       </tr>
       </table>
