@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemstone Receipt Generator</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid black; padding: 8px; text-align: center; }
+    .btn { padding: 8px 12px; margin: 5px; cursor: pointer; }
+    #receipt { margin-top: 40px; }
+    @media print {
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<h2>Gemstone Receipt Generator</h2>
+
+<div class="no-print">
+  <input type="text" id="stone" placeholder="Stone Name">
+  <input type="number" id="qty" placeholder="Quantity">
+  <input type="number" id="price" placeholder="Price per unit">
+  <button class="btn" onclick="addItem()">Add</button>
+  <button class="btn" onclick="generateReceipt()">Generate Receipt</button>
+</div>
+
+<table id="inputTable">
+  <thead>
+    <tr>
+      <th>Stone</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="receipt"></div>
+
+<script>
+  let items = [];
+
+  function addItem() {
+    const stone = document.getElementById('stone').value;
+    const qty = parseFloat(document.getElementById('qty').value);
+    const price = parseFloat(document.getElementById('price').value);
+
+    if (!stone || !qty || !price) {
+      alert('Please fill all fields');
+      return;
+    }
+
+    const total = qty * price;
+    items.push({ stone, qty, price, total });
+
+    const row = `<tr>
+      <td>${stone}</td>
+      <td>${qty}</td>
+      <td>${price}</td>
+      <td>${total}</td>
+    </tr>`;
+
+    document.querySelector('#inputTable tbody').innerHTML += row;
+
+    document.getElementById('stone').value = '';
+    document.getElementById('qty').value = '';
+    document.getElementById('price').value = '';
+  }
+
+  function generateReceipt() {
+    let grandTotal = 0;
+
+    let receiptHTML = `
+      <h3>Official Receipt</h3>
+      <table>
+        <tr>
+          <th>Stone</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>`;
+
+    items.forEach(item => {
+      grandTotal += item.total;
+      receiptHTML += `
+        <tr>
+          <td>${item.stone}</td>
+          <td>${item.qty}</td>
+          <td>${item.price}</td>
+          <td>${item.total}</td>
+        </tr>`;
+    });
+
+    receiptHTML += `
+      <tr>
+        <td colspan="3"><strong>Grand Total</strong></td>
+        <td><strong>${grandTotal}</strong></td>
+      </tr>
+      </table>
+      <button class="btn no-print" onclick="window.print()">Print Receipt</button>
+    `;
+
+    document.getElementById('receipt').innerHTML = receiptHTML;
+  }
+</script>
+
+</body>
+</html>
